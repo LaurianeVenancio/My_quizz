@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Entity\Category;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Reponse;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * @var UserRepository
+ */
+class UserController extends AbstractController
+{
+    /**
+     * @Route("/user", name="user")
+     */
+    public function index()
+    {
+        return $this->render('user/index.html.twig', [
+            'controller_name' => 'UserController',
+        ]);
+    }
+
+    /**
+     * @Route("/validate/{id}", name="validate.update")
+     */
+    public function updateValidate($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $valide = $entityManager->getRepository(User::class)
+            ->find($id);
+
+        if (!$valide) {
+            throw $this->createNotFoundException(
+            'There are no user with the following id: ' . $id
+            );
+        }
+        $valide->setValidated(true);
+        $entityManager->flush();
+        return $this->render('/validate.html.twig', compact('valide'));
+    }
+}
